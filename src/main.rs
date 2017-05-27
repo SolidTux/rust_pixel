@@ -1,14 +1,12 @@
 extern crate image;
 
-use image::*;
 use std::io::prelude::*;
 use std::net::TcpStream;
 use std::thread;
 use std::time::Duration;
 
 fn main() {
-    let nthreads = 10;
-    let image = open("image.png").expect("image").to_rgba();
+    let nthreads = 1000;
 
     loop {
         let x0 = 1250;
@@ -16,8 +14,7 @@ fn main() {
         let mut handles = Vec::new();
         println!("→ {} {}", x0, y0);
         for n in 0..nthreads {
-            let img = image.clone();
-            let xoff = n*image.width()/nthreads;
+            let xoff = n*1920/nthreads;
             handles.push(thread::spawn(move || {
                 loop {
                     match TcpStream::connect("94.45.231.39:1234") {
@@ -26,18 +23,15 @@ fn main() {
                             let mut y = 0;
                             let mut x = xoff;
                             loop {
-                                y = (y+1) % img.height();
+                                y = (y+1) % 1200;
                                 if y == 0 {
-                                    x = (x+1) % img.width();
+                                    x = (x+1) % 1920;
                                 }
-                                let (r, g, b, a) = img.get_pixel(x, y).channels4();
-                                if a > 10 {
-                                    match stream.write_fmt(format_args!("PX {} {} {:02X}{:02X}{:02X}\n", x0+x, y0+y, r, g, b)) {
-                                        Ok(_) => {},
-                                        Err(_) => {
-                                            println!("Write error, connecting again ..");
-                                            break
-                                        }
+                                match stream.write_fmt(format_args!("PX {} {} 00FF00\n", x, y)) {
+                                    Ok(_) => {},
+                                    Err(_) => {
+                                        println!("Write error, connecting again ..");
+                                        break
                                     }
                                 }
                             }
@@ -53,5 +47,5 @@ fn main() {
         for h in handles.into_iter() {
             h.join().unwrap();
         }
-        }
     }
+}
