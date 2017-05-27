@@ -1,6 +1,7 @@
 extern crate image;
 
 use std::io::prelude::*;
+use std::io::*;
 use std::net::TcpStream;
 use std::thread;
 use std::time::Duration;
@@ -18,8 +19,9 @@ fn main() {
             handles.push(thread::spawn(move || {
                 loop {
                     match TcpStream::connect("94.45.231.39:1234") {
-                        Ok(mut stream) => {
-                            stream.set_nodelay(true).expect("set_nodelay call failed");
+                        Ok(tcp) => {
+                            tcp.set_nodelay(true).expect("set_nodelay call failed");
+                            let mut stream = BufWriter::new(tcp);
                             let mut y = 0;
                             let mut x = xoff;
                             loop {
