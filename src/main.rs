@@ -11,7 +11,7 @@ fn main() {
     let image = open("image.png").expect("image").to_rgba();
 
     loop {
-        let x0 = 1200;
+        let x0 = 1250;
         let y0 = 400;
         let mut handles = Vec::new();
         println!("→ {} {}", x0, y0);
