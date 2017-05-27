@@ -21,7 +21,7 @@ fn main() {
                     match TcpStream::connect("94.45.231.39:1234") {
                         Ok(tcp) => {
                             tcp.set_nodelay(true).expect("set_nodelay call failed");
-                            let mut stream = BufWriter::new(tcp);
+                            let mut stream = BufWriter::with_capacity(50_000, tcp);
                             let mut y = 0;
                             let mut x = xoff;
                             loop {
@@ -29,7 +29,7 @@ fn main() {
                                 if y == 0 {
                                     x = (x+1) % 1920;
                                 }
-                                match stream.write_fmt(format_args!("PX {} {} 00FF00\n", x, y)) {
+                                match stream.write_fmt(format_args!("PX {} {} EA5B0C\n", x, y)) {
                                     Ok(_) => {},
                                     Err(_) => {
                                         println!("Write error, connecting again ..");
